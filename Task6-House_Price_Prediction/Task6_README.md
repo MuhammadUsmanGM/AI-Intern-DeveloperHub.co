@@ -1,5 +1,8 @@
 # Task 6: House Price Prediction
 
+## 🌐 Live Deployment
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-6b4gz4tvvfxs5rkvgpzf3e.streamlit.app/)
+
 ## 📊 Overview
 This task builds regression models to predict house prices based on property features such as square footage, bedrooms, bathrooms, and other real estate characteristics.
 

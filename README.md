@@ -2,6 +2,17 @@
 
 This repository contains the complete set of AI/ML projects completed as part of the DevelopersHub AI/ML Engineering Internship program.
 
+## Live Deployments
+
+Access the applications online:
+
+- **Task 1 - Iris Dataset Explorer**: [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-7fhcksrtr4zum3jnyh9eht.streamlit.app/)
+- **Task 2 - Stock Price Predictor**: [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-d4nxyuajpm9z3dfheryxyr.streamlit.app/)
+- **Task 3 - Heart Disease Predictor**: [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-2gyhhlkeeadrrrycw2h9bp.streamlit.app/)
+- **Task 4 - Health Query Assistant**: [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-ev9yfkshr9zdh3xsvyyacq.streamlit.app/)
+- **Task 5 - Mental Health Chatbot**: [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-tsfmow8wgxuccc53kzvkje.streamlit.app/)
+- **Task 6 - House Price Predictor**: [![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-6b4gz4tvvfxs5rkvgpzf3e.streamlit.app/)
+
 ## Portfolio Dashboard
 
 The `portfolio_dashboard_app.py` file contains a Streamlit application that combines all the individual projects into a single interface. This allows you to navigate between different applications from one dashboard.

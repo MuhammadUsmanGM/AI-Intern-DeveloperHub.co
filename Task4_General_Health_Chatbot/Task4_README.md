@@ -1,5 +1,8 @@
 # Task 4: General Health Query Chatbot (Prompt Engineering Based)
 
+## 🌐 Live Deployment
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-ev9yfkshr9zdh3xsvyyacq.streamlit.app/)
+
 ## 📊 Overview
 This task creates a responsible health information chatbot using prompt engineering techniques, LLM integration, and comprehensive safety filters to handle health-related queries appropriately.
 

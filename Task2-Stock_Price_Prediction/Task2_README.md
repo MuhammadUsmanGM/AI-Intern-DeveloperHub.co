@@ -1,5 +1,8 @@
 # Task 2: Predict Future Stock Prices (Short-Term)
 
+## 🌐 Live Deployment
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-d4nxyuajpm9z3dfheryxyr.streamlit.app/)
+
 ## 📊 Overview
 This task implements regression models to predict the next day's closing stock price using historical OHLCV (Open, High, Low, Close, Volume) data from Yahoo Finance.
 

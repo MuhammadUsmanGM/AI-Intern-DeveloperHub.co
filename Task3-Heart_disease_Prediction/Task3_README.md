@@ -1,5 +1,8 @@
 # Task 3: Heart Disease Prediction
 
+## 🌐 Live Deployment
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-2gyhhlkeeadrrrycw2h9bp.streamlit.app/)
+
 ## 📊 Overview
 This task builds binary classification models to predict whether a patient is at risk of heart disease based on various health metrics and medical features.
 

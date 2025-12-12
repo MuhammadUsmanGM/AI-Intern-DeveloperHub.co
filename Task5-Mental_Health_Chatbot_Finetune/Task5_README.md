@@ -1,5 +1,8 @@
 # Task 5: Mental Health Support Chatbot (Fine-Tuned)
 
+## 🌐 Live Deployment
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-tsfmow8wgxuccc53kzvkje.streamlit.app/)
+
 ## 📊 Overview
 This task fine-tunes a language model on empathetic dialogue data to create a supportive chatbot for mental health conversations, focusing on stress, anxiety, and emotional wellness.
 

@@ -1,5 +1,8 @@
 # Task 1: Exploring and Visualizing a Simple Dataset
 
+## 🌐 Live Deployment
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://ai-intern-developerappco-7fhcksrtr4zum3jnyh9eht.streamlit.app/)
+
 ## 📊 Overview
 This task focuses on fundamental data exploration and visualization techniques using the classic Iris dataset. It demonstrates essential pandas operations and matplotlib/seaborn visualizations.
 
