@@ -26,8 +26,30 @@ Each task folder contains the Jupyter notebook, README, and any associated Strea
 
 ## Requirements
 
-All required packages are listed in `requirements.txt` and will be installed with:
+Each task has its own `requirements.txt` file in its respective folder. Install requirements for each task separately:
 ```bash
+# For Task 1 (Iris Dataset Explorer)
+cd Task1-Irsi_Dataset_Exploration
+pip install -r requirements.txt
+
+# For Task 2 (Stock Price Prediction)
+cd Task2-Stock_Price_Prediction
+pip install -r requirements.txt
+
+# For Task 3 (Heart Disease Prediction)
+cd Task3-Heart_disease_Prediction
+pip install -r requirements.txt
+
+# For Task 4 (Health Query Assistant) - includes Google Generative AI
+cd Task4_General_Health_Chatbot
+pip install -r requirements.txt
+
+# For Task 5 (Mental Health Chatbot) - includes Google Generative AI
+cd Task5-Mental_Health_Chatbot_Finetune
+pip install -r requirements.txt
+
+# For Task 6 (House Price Prediction)
+cd Task6-House_Price_Prediction
 pip install -r requirements.txt
 ```
 
