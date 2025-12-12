@@ -29,8 +29,11 @@ jupyter==1.0.0
 jupyterlab==4.0.3
 notebook==7.0.2
 
-# Utilities
+# Generative AI
+google-generativeai==0.3.2
 python-dotenv==1.0.0
+
+# Utilities
 tqdm==4.66.1
 
 # Optional: For GPU support (uncomment if you have CUDA)

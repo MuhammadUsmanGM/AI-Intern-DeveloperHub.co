@@ -4,6 +4,15 @@ from typing import Optional, List, Dict
 import warnings
 warnings.filterwarnings('ignore')
 
+# Try to import Google Generative AI
+try:
+    import google.generativeai as genai
+    from google.generativeai import GenerativeModel
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+    print("Google Generative AI not available. Install with: pip install google-generativeai")
+
 # Define high-risk keywords that require emergency response
 EMERGENCY_KEYWORDS = [
     'suicide', 'kill myself', 'harm myself', 'overdose',
@@ -29,7 +38,7 @@ VALID_HEALTH_TOPICS = [
 ]
 
 # System prompt for the health chatbot
-SYSTEM_PROMPT = """You are a friendly, helpful, and responsible medical information assistant.
+HEALTH_SYSTEM_PROMPT = """You are a friendly, helpful, and responsible medical information assistant.
 
 IMPORTANT GUIDELINES:
 1. You provide GENERAL EDUCATIONAL INFORMATION about health topics, not medical diagnoses or treatment plans.
@@ -93,12 +102,31 @@ def is_health_related(text: str) -> bool:
     return any(keyword in text_lower for keyword in health_keywords)
 
 class HealthChatbot:
-    """A responsible health information chatbot with safety filters and prompt engineering."""
-    
+    """A responsible health information chatbot with safety filters and Google Generative AI."""
+
     def __init__(self):
         self.conversation_history = []
         self.total_queries = 0
         self.blocked_queries = 0
+
+        # Initialize Google Generative AI if available
+        self.gemini_model = None
+        if GEMINI_AVAILABLE:
+            try:
+                # Get API key from environment variable
+                import os
+                from dotenv import load_dotenv
+                load_dotenv()
+
+                api_key = os.getenv("GOOGLE_API_KEY")
+                if api_key:
+                    genai.configure(api_key=api_key)
+                    # Use gemini-2.5-flash-lite model as requested
+                    self.gemini_model = genai.GenerativeModel('gemini-2.5-flash-lite')
+                else:
+                    st.warning("Google API key not found. Using fallback responses.")
+            except Exception as e:
+                st.warning(f"Could not initialize Google Generative AI: {str(e)}. Using fallback responses.")
     
     def check_safety(self, query: str) -> Dict[str, any]:
         """Check query for safety issues."""
@@ -136,10 +164,42 @@ class HealthChatbot:
             'severity': 'NONE'
         }
     
-    def _template_response(self, query: str) -> str:
-        """Generate a template-based response for common health queries."""
+    def _get_gemini_response(self, query: str) -> str:
+        """Get response from Google Generative AI."""
+        if self.gemini_model is None:
+            return self._fallback_response(query)
+
+        try:
+            # Construct the prompt with safety guidelines
+            full_prompt = f"""
+            {HEALTH_SYSTEM_PROMPT}
+
+            User query: {query}
+
+            Please provide a helpful, general health information response following all safety guidelines mentioned above.
+            """
+
+            response = self.gemini_model.generate_content(
+                full_prompt,
+                generation_config={
+                    "temperature": 0.7,
+                    "max_output_tokens": 500,
+                }
+            )
+
+            if response.text:
+                return response.text
+            else:
+                return self._fallback_response(query)
+
+        except Exception as e:
+            st.warning(f"Error with Google Generative AI: {str(e)}. Using fallback response.")
+            return self._fallback_response(query)
+
+    def _fallback_response(self, query: str) -> str:
+        """Generate a template-based fallback response for common health queries."""
         query_lower = query.lower()
-        
+
         # Common health conditions
         if 'cold' in query_lower or 'cough' in query_lower:
             return (
@@ -152,7 +212,7 @@ class HealthChatbot:
                 "• Use saline nasal drops for congestion\n\n"
                 "Seek medical attention if symptoms persist beyond 10 days or worsen significantly."
             )
-        
+
         elif 'headache' in query_lower:
             return (
                 "Headaches can have various causes. General tips to manage them:\n"
@@ -163,7 +223,7 @@ class HealthChatbot:
                 "• Avoid triggers like stress or certain foods\n\n"
                 "If headaches are frequent or severe, consult a healthcare provider."
             )
-        
+
         elif 'fever' in query_lower:
             return (
                 "Fever is often the body's way of fighting infection. General care:\n"
@@ -173,7 +233,7 @@ class HealthChatbot:
                 "• Monitor your temperature\n\n"
                 "Seek immediate medical attention if fever exceeds 103°F (39.4°C) or lasts more than 3 days."
             )
-        
+
         elif 'sleep' in query_lower or 'insomnia' in query_lower:
             return (
                 "Good sleep hygiene tips:\n"
@@ -185,7 +245,7 @@ class HealthChatbot:
                 "• Try relaxation techniques like deep breathing\n\n"
                 "If sleep problems persist, consult a sleep specialist."
             )
-        
+
         elif 'stress' in query_lower or 'anxiety' in query_lower:
             return (
                 "Ways to manage stress and anxiety:\n"
@@ -198,7 +258,7 @@ class HealthChatbot:
                 "• Consider professional mental health support\n\n"
                 "If anxiety significantly impacts daily life, please seek help from a mental health professional."
             )
-        
+
         elif 'diet' in query_lower or 'nutrition' in query_lower:
             return (
                 "Healthy eating guidelines:\n"
@@ -210,7 +270,7 @@ class HealthChatbot:
                 "• Eat in moderation\n\n"
                 "For personalized nutrition advice, consult a registered dietitian."
             )
-        
+
         elif 'exercise' in query_lower or 'workout' in query_lower:
             return (
                 "Exercise recommendations:\n"
@@ -222,7 +282,7 @@ class HealthChatbot:
                 "• Stay hydrated during exercise\n\n"
                 "Consult your doctor before starting a new exercise program, especially if you have health concerns."
             )
-        
+
         elif 'when' in query_lower and 'doctor' in query_lower:
             return (
                 "You should see a doctor if you experience:\n"
@@ -244,14 +304,14 @@ class HealthChatbot:
                 "• Any concerning symptoms: Better to be safe and get them checked\n\n"
                 "Remember, only a qualified healthcare provider can properly evaluate persistent symptoms."
             )
-        
+
         else:
             return (
-                f"Thanks for your question about health. While I don't have a specific answer to '{query}', "
+                f"Thanks for your question about health. While I can provide general information about '{query}', "
                 "I recommend:\n"
-                "• Consulting with a healthcare professional\n"
+                "• Consulting with a healthcare professional for personalized advice\n"
                 "• Checking reliable health websites (WHO, CDC, Mayo Clinic)\n"
-                "• Keeping track of your symptoms\n\n"
+                "• Keeping track of your symptoms and when they occur\n\n"
                 "I'm here to provide general health information. Feel free to ask about symptoms, prevention, "
                 "lifestyle changes, or when to see a doctor!"
             )
@@ -259,15 +319,15 @@ class HealthChatbot:
     def chat(self, query: str) -> str:
         """Main chat interface."""
         self.total_queries += 1
-        
+
         # Check safety first
         safety_check = self.check_safety(query)
-        
+
         # If not safe, return safety response
         if not safety_check['is_safe']:
             self.blocked_queries += 1
             return safety_check['response']
-        
+
         # If not health-related, respond appropriately
         if safety_check['reason'] == 'NON_HEALTH_QUERY':
             return (
@@ -275,17 +335,20 @@ class HealthChatbot:
                 "Your question doesn't seem to be health-related. "
                 "Feel free to ask me about symptoms, prevention, healthy habits, or when to see a doctor!"
             )
-        
-        # Generate template response
-        response = self._template_response(query)
-        
+
+        # Get response from Gemini if available, otherwise use fallback
+        if GEMINI_AVAILABLE and self.gemini_model:
+            response = self._get_gemini_response(query)
+        else:
+            response = self._fallback_response(query)
+
         # Store in history
         self.conversation_history.append({
             'user': query,
             'bot': response,
             'timestamp': len(self.conversation_history)
         })
-        
+
         return response
 
 # Set up the page configuration

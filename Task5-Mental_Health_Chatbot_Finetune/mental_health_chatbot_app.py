@@ -4,16 +4,58 @@ from typing import List, Dict
 import warnings
 warnings.filterwarnings('ignore')
 
+# Try to import Google Generative AI
+try:
+    import google.generativeai as genai
+    GEMINI_AVAILABLE = True
+except ImportError:
+    GEMINI_AVAILABLE = False
+    print("Google Generative AI not available. Install with: pip install google-generativeai")
+
+# System prompt for the mental health chatbot
+MENTAL_HEALTH_SYSTEM_PROMPT = """You are a supportive, empathetic, and responsible mental health assistant.
+
+IMPORTANT GUIDELINES:
+1. Provide empathetic and supportive responses that acknowledge the user's feelings
+2. Focus on active listening and validation of emotions
+3. Encourage healthy coping strategies like talking to professionals, friends, or family
+4. Never provide clinical diagnoses or replace professional therapy
+5. Always encourage seeking help from licensed mental health professionals
+6. Be compassionate and non-judgmental
+7. Suggest resources like crisis hotlines when appropriate
+8. Maintain safety and avoid harmful language
+
+You respond in a caring, understanding, and supportive manner."""
+
 class MentalHealthChatbot:
     """
-    A supportive mental health chatbot with empathetic responses.
+    A supportive mental health chatbot with empathetic responses powered by Google Generative AI.
     """
-    
+
     def __init__(self):
         self.conversation_history = []
         self.total_conversations = 0
-        
-        # Empathetic responses templates
+
+        # Initialize Google Generative AI if available
+        self.gemini_model = None
+        if GEMINI_AVAILABLE:
+            try:
+                # Get API key from environment variable
+                import os
+                from dotenv import load_dotenv
+                load_dotenv()
+
+                api_key = os.getenv("GOOGLE_API_KEY")
+                if api_key:
+                    genai.configure(api_key=api_key)
+                    # Use gemini-2.5-flash-lite model as requested
+                    self.gemini_model = genai.GenerativeModel('gemini-2.5-flash-lite')
+                else:
+                    st.warning("Google API key not found. Using fallback responses.")
+            except Exception as e:
+                st.warning(f"Could not initialize Google Generative AI: {str(e)}. Using fallback responses.")
+
+        # Empathetic responses templates (as backup)
         self.templates = {
             'anxiety': [
                 "I understand anxiety can be overwhelming. Remember, you're not alone in feeling this way.",
@@ -47,28 +89,65 @@ class MentalHealthChatbot:
             ]
         }
     
-    def get_template_response(self, user_input: str) -> str:
-        """Get a template-based empathetic response."""
+    def _get_gemini_response(self, user_input: str) -> str:
+        """Get response from Google Generative AI."""
+        if self.gemini_model is None:
+            return self._fallback_response(user_input)
+
+        try:
+            # Construct the prompt with mental health guidelines
+            full_prompt = f"""
+            {MENTAL_HEALTH_SYSTEM_PROMPT}
+
+            User input: {user_input}
+
+            Please provide a helpful, empathetic, and supportive response following all safety guidelines mentioned above.
+            Focus on validating their feelings, offering gentle encouragement, and suggesting healthy coping mechanisms.
+            """
+
+            response = self.gemini_model.generate_content(
+                full_prompt,
+                generation_config={
+                    "temperature": 0.8,  # Slightly higher for more empathetic responses
+                    "max_output_tokens": 500,
+                }
+            )
+
+            if response.text:
+                return response.text
+            else:
+                return self._fallback_response(user_input)
+
+        except Exception as e:
+            st.warning(f"Error with Google Generative AI: {str(e)}. Using fallback response.")
+            return self._fallback_response(user_input)
+
+    def _fallback_response(self, user_input: str) -> str:
+        """Get a template-based empathetic fallback response."""
         user_lower = user_input.lower()
-        
+
         # Check for key emotional indicators
         for emotion, responses in self.templates.items():
             if emotion != 'default' and emotion in user_lower:
                 return np.random.choice(responses)
-        
+
         # Return default response
         return np.random.choice(self.templates['default'])
-    
+
     def chat(self, user_input: str) -> str:
         """Main chat interface with conversation tracking."""
-        response = self.get_template_response(user_input)
-        
+        # Get response from Gemini if available, otherwise use fallback
+        if GEMINI_AVAILABLE and self.gemini_model:
+            response = self._get_gemini_response(user_input)
+        else:
+            response = self._fallback_response(user_input)
+
         # Track conversation
         self.conversation_history.append({
             'user': user_input,
             'bot': response
         })
-        
+
         self.total_conversations += 1
         return response
     
